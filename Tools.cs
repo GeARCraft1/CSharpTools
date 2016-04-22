@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -178,10 +179,11 @@ namespace Utils
                 System.Diagnostics.Process process = new System.Diagnostics.Process();
                 System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
                 startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                startInfo.FileName = "cmd.exe";
-                startInfo.Arguments = "/C explorer.exe";
+                startInfo.FileName = Path.Combine(Environment.GetEnvironmentVariable("windir"), "explorer.exe"); ;
+                
                 process.StartInfo = startInfo;
                 process.Start();
+                isEnabledInternal = false;
             }
         }
 
