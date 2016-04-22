@@ -165,20 +165,23 @@ namespace Utils
                     alternativeKiller.Start();
 
                 }
+                isEnabledInternal = true;
             }
-
+            
         }
 
         public static void DisableKiosk()
         {
+            
             if (isEnabled())
             {
-                ProcessStartInfo cfg = new ProcessStartInfo("explorer.exe");
-                cfg.CreateNoWindow = true;
-                cfg.UseShellExecute = true;
-                Process explorer = new Process();
-                explorer.StartInfo = cfg;
-                explorer.Start();
+                System.Diagnostics.Process process = new System.Diagnostics.Process();
+                System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+                startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                startInfo.FileName = "cmd.exe";
+                startInfo.Arguments = "/C explorer.exe";
+                process.StartInfo = startInfo;
+                process.Start();
             }
         }
 
