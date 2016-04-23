@@ -31,53 +31,72 @@ namespace Utils
 
     class ColorChanger
     {
-        private Thread thread;
+        
+        private static Thread thread;
         private volatile static bool Changing = false;
+        private volatile static bool ShouldRun = true;
         public ColorChanger(Brush bg, Dispatcher dispatcher)
         {
+            
             Color defaultColor = ((SolidColorBrush) bg).Color;
             thread = new Thread(()=>ThreadSys(bg, dispatcher, defaultColor));
         }
 
         private static void ThreadSys(Brush bg, Dispatcher dispatcher, Color defaultColor)
         {
-            
-            while (Changing)
+            while (ShouldRun)
             {
-                dispatcher.Invoke(() =>
+
+                while (Changing)
                 {
-                    Random random = new Random();
-                    ColorAnimation animation = new ColorAnimation();
-                    animation.From = ((SolidColorBrush)bg).Color;
-                    animation.To = Color.FromRgb((byte)random.Next(0, 255), (byte)random.Next(0, 255), (byte)random.Next(0, 255));
-                    animation.Duration = new Duration(TimeSpan.FromSeconds(1));
-                    bg.BeginAnimation(SolidColorBrush.ColorProperty, animation);
-                });
-                Thread.Sleep(1000);
-            }
-            if (Changing == false)
-            {
-                dispatcher.Invoke(() =>
+                    dispatcher.Invoke(() =>
+                    {
+                        Random random = new Random();
+                        ColorAnimation animation = new ColorAnimation();
+                        animation.From = ((SolidColorBrush) bg).Color;
+                        animation.To = Color.FromRgb((byte) random.Next(0, 255), (byte) random.Next(0, 255),
+                            (byte) random.Next(0, 255));
+                        animation.Duration = new Duration(TimeSpan.FromSeconds(1));
+                        bg.BeginAnimation(SolidColorBrush.ColorProperty, animation);
+                    });
+                    Thread.Sleep(1000);
+                }
+                if (!Changing)
                 {
-                    Random random = new Random();
-                    ColorAnimation animation = new ColorAnimation();
-                    animation.From = ((SolidColorBrush)bg).Color;
-                    animation.To = defaultColor;
-                    animation.Duration = new Duration(TimeSpan.FromSeconds(1));
-                    bg.BeginAnimation(SolidColorBrush.ColorProperty, animation);
-                });
+                    dispatcher.Invoke(() =>
+                    {
+                       // Random random = new Random();
+                        ColorAnimation animation = new ColorAnimation();
+                        animation.From = ((SolidColorBrush) bg).Color;
+                        animation.To = defaultColor;
+                        animation.Duration = new Duration(TimeSpan.FromSeconds(1));
+                        bg.BeginAnimation(SolidColorBrush.ColorProperty, animation);
+                    });
+                }
             }
         }
 
         public void Start()
         {
+
             Changing = true;
-            thread.Start();
+            try
+            {
+                thread.Start();
+            } catch (ThreadStateException) { }
         }
 
         public void Stop()
         {
             Changing = false;
+            
+
+        }
+
+        public void Kill()
+        {
+            Changing = false;
+            ShouldRun = false;
         }
     }
 
