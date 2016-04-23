@@ -86,6 +86,9 @@ namespace Utils
         [DllImport("user32.dll")]
         private static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
 
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        private static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, IntPtr wParam, IntPtr lParam);
+
         [DllImport("user32.dll")]
         private static extern bool CloseWindow(IntPtr hWnd);
 
@@ -132,9 +135,14 @@ namespace Utils
             }
             
         }
+
+        public void Kill()
+        {
+            SendMessage(hWnd, 0x0010, IntPtr.Zero, IntPtr.Zero);
+        }
     
 }
-
+   
     static class Kiosk
     {
         private static bool isEnabledInternal = false;
