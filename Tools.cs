@@ -93,6 +93,17 @@ namespace Utils
 
         }
 
+        public bool isChanging()
+        {
+            return Changing;
+        }
+
+        public bool isAlive()
+        {
+            return ShouldRun;
+        }
+
+
         public void Kill()
         {
             Changing = false;
