@@ -38,8 +38,7 @@ namespace Utils
 
         public static HttpStatusCode GetHeaders(string url)
         {
-            try
-            {
+            
                 HttpStatusCode result = default(HttpStatusCode);
 
                 var request = HttpWebRequest.Create(url);
@@ -55,12 +54,10 @@ namespace Utils
                 }
 
                 return result;
-            }
-            catch (WebException ex)
-            {
-                return (HttpStatusCode)ex.Status;
-            }
+            
+            
         }
+        
         public static string CalculateMD5Hash(string input)
 
         {
