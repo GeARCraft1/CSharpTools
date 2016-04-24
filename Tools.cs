@@ -1,17 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Microsoft.CSharp.RuntimeBinder;
+using Brush = System.Windows.Media.Brush;
+using Color = System.Windows.Media.Color;
 
 namespace Utils
 {
@@ -27,19 +33,40 @@ namespace Utils
 
             return process;
         }
+
+
+        public static HttpStatusCode GetHeaders(string url)
+        {
+            HttpStatusCode result = default(HttpStatusCode);
+
+            var request = HttpWebRequest.Create(url);
+            request.Method = "HEAD";
+            using (var response = request.GetResponse() as HttpWebResponse)
+            {
+                if (response != null)
+                {
+                    result = response.StatusCode;
+                    response.Close();
+                }
+            }
+
+            return result;
+        }
+
+
     }
 
     class ColorChanger
     {
-        
+
         private static Thread thread;
         private volatile static bool Changing = false;
         private volatile static bool ShouldRun = true;
         public ColorChanger(Brush bg, Dispatcher dispatcher)
         {
-            
-            Color defaultColor = ((SolidColorBrush) bg).Color;
-            thread = new Thread(()=>ThreadSys(bg, dispatcher, defaultColor));
+
+            Color defaultColor = ((SolidColorBrush)bg).Color;
+            thread = new Thread(() => ThreadSys(bg, dispatcher, defaultColor));
         }
 
         private static void ThreadSys(Brush bg, Dispatcher dispatcher, Color defaultColor)
@@ -53,9 +80,9 @@ namespace Utils
                     {
                         Random random = new Random();
                         ColorAnimation animation = new ColorAnimation();
-                        animation.From = ((SolidColorBrush) bg).Color;
-                        animation.To = Color.FromRgb((byte) random.Next(0, 255), (byte) random.Next(0, 255),
-                            (byte) random.Next(0, 255));
+                        animation.From = ((SolidColorBrush)bg).Color;
+                        animation.To = Color.FromRgb((byte)random.Next(0, 255), (byte)random.Next(0, 255),
+                            (byte)random.Next(0, 255));
                         animation.Duration = new Duration(TimeSpan.FromSeconds(1));
                         bg.BeginAnimation(SolidColorBrush.ColorProperty, animation);
                     });
@@ -65,9 +92,9 @@ namespace Utils
                 {
                     dispatcher.Invoke(() =>
                     {
-                       // Random random = new Random();
+                        // Random random = new Random();
                         ColorAnimation animation = new ColorAnimation();
-                        animation.From = ((SolidColorBrush) bg).Color;
+                        animation.From = ((SolidColorBrush)bg).Color;
                         animation.To = defaultColor;
                         animation.Duration = new Duration(TimeSpan.FromSeconds(1));
                         bg.BeginAnimation(SolidColorBrush.ColorProperty, animation);
@@ -83,13 +110,14 @@ namespace Utils
             try
             {
                 thread.Start();
-            } catch (ThreadStateException) { }
+            }
+            catch (ThreadStateException) { }
         }
 
         public void Stop()
         {
             Changing = false;
-            
+
 
         }
 
@@ -149,7 +177,7 @@ namespace Utils
 
         public void setVisibility(WindowSize size)
         {
-            bool success = ShowWindowAsync(hWnd, (int) size);
+            bool success = ShowWindowAsync(hWnd, (int)size);
             if (!success)
             {
                 throw new Exception("Win32API said that there was an error!");
@@ -163,16 +191,16 @@ namespace Utils
             {
                 throw new Exception("Win32API said that there was an error!");
             }
-            
+
         }
 
         public void Kill()
         {
             SendMessage(hWnd, 0x0010, IntPtr.Zero, IntPtr.Zero);
         }
-    
-}
-   
+
+    }
+
     static class Kiosk
     {
         private static bool isEnabledInternal = false;
@@ -206,19 +234,19 @@ namespace Utils
                 }
                 isEnabledInternal = true;
             }
-            
+
         }
 
         public static void DisableKiosk()
         {
-            
+
             if (isEnabled())
             {
                 System.Diagnostics.Process process = new System.Diagnostics.Process();
                 System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
                 startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
                 startInfo.FileName = Path.Combine(Environment.GetEnvironmentVariable("windir"), "explorer.exe"); ;
-                
+
                 process.StartInfo = startInfo;
                 process.Start();
                 isEnabledInternal = false;
@@ -227,5 +255,8 @@ namespace Utils
 
 
     }
+
+
+    
 
 }
