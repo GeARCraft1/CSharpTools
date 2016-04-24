@@ -38,26 +38,26 @@ namespace Utils
 
         public static HttpStatusCode GetHeaders(string url)
         {
-            
-                HttpStatusCode result = default(HttpStatusCode);
 
-                var request = HttpWebRequest.Create(url);
+            HttpStatusCode result = default(HttpStatusCode);
 
-                request.Method = "HEAD";
-                using (var response = request.GetResponse() as HttpWebResponse)
+            var request = HttpWebRequest.Create(url);
+
+            request.Method = "HEAD";
+            using (var response = request.GetResponse() as HttpWebResponse)
+            {
+                if (response != null)
                 {
-                    if (response != null)
-                    {
-                        result = response.StatusCode;
-                        response.Close();
-                    }
+                    result = response.StatusCode;
+                    response.Close();
                 }
+            }
 
-                return result;
-            
-            
+            return result;
+
+
         }
-        
+
         public static string CalculateMD5Hash(string input)
 
         {
@@ -83,7 +83,7 @@ namespace Utils
 
             }
 
-            return sb.ToString();
+            return sb.ToString().ToLower();
 
         }
 
@@ -291,6 +291,6 @@ namespace Utils
     }
 
 
-    
+
 
 }
